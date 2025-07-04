@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Navbar from './components/Navbar.jsx';
-import HomePage from './pages/HomePage.jsx';
-import AuthPage from './pages/AuthPage.jsx';
-import AdminDashboard from './pages/AdminDashboard.jsx';
-import UserAccount from './pages/UserAccount.jsx';
-import ReviewForm from './pages/ReviewForm.jsx';
-import HotelReviews from './pages/HotelReviews.jsx';
+import Navbar from './Components/Navbar.jsx';
+import HomePage from './Pages/HomePage.jsx';
+import AuthPage from './Pages/AuthPage.jsx';
+import AdminDashboard from './Pages/AdminDashboard.jsx';
+import UserAccount from './Pages/UserAccount.jsx';
+import ReviewForm from './Pages/ReviewForm.jsx';
+import HotelReviews from './Pages/HotelReviews.jsx';
 
 // Main App component
 const App = () => {
@@ -22,7 +22,7 @@ const App = () => {
     const [refreshHotelsTrigger, setRefreshHotelsTrigger] = useState(0); // State to trigger hotels fetch
 
     // Base URL for backend API - *** IMPORTANT: REPLACE THIS WITH YOUR RENDER BACKEND URL ***
-    const API_BASE_URL = 'https://your-backend-name.onrender.com'; // Example: 'https://rating-app-backend-abc.onrender.com'
+    const API_BASE_URL = 'https://hrbackend-6tqe.onrender.com'; 
 
     // Function to fetch hotels from backend
     const fetchHotels = useCallback(async () => { // Wrapped in useCallback
