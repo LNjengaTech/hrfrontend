@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './Components/Navbar.jsx';
-import HomePage from './Pages/HomePage.jsx';
-import AuthPage from './Pages/AuthPage.jsx';
-import AdminDashboard from './Pages/AdminDashboard.jsx';
-import UserAccount from './Pages/UserAccount.jsx';
-import ReviewForm from './Pages/ReviewForm.jsx';
-import HotelReviews from './Pages/HotelReviews.jsx';
+import HomePage from './pages/HomePage.jsx';
+import AuthPage from './pages/AuthPage.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
+import UserAccount from './pages/UserAccount.jsx';
+import ReviewForm from './pages/ReviewForm.jsx';
+import HotelReviews from './pages/HotelReviews.jsx';
 
 // Main App component
 const App = () => {
