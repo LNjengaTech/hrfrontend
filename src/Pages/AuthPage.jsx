@@ -1,66 +1,61 @@
 import React, { useState } from 'react';
 
-// Authentication Page (Login/Register)
-// Authentication Page (Login/Register)
-const AuthPage = ({ onLoginSuccess, onGoBack }) => {
+const AuthPage = ({ onLoginSuccess, onGoBack, API_BASE_URL }) => { // Added API_BASE_URL prop
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState(''); // Only for register
     const [message, setMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false); // Loading state
 
-    const handleSubmit = async (e) => { // Made async to handle fetch
+    const handleSubmit = async (e) => { // Made async
         e.preventDefault();
         setMessage(''); // Clear previous messages
-
-        const API_BASE_URL = 'http://localhost:5000/api/auth'; // Backend auth endpoint
+        setIsLoading(true); // Set loading state
 
         try {
-            let response;
-            let responseData; // Use a new variable for parsed JSON data
+            let url;
+            let body;
 
             if (isLoginMode) {
-                response = await fetch(`${API_BASE_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                responseData = await response.json(); // Parse JSON response
-
-                if (response.ok) {
-                    setMessage('Login successful!');
-                    // Pass the entire user object and token from backend response
-                    onLoginSuccess({
-                        token: responseData.token,
-                        id: responseData.user.id,
-                        username: responseData.user.username,
-                        email: responseData.user.email,
-                        isAdmin: responseData.user.isAdmin
-                    });
-                } else {
-                    setMessage(`Login failed: ${responseData.message || 'Invalid credentials.'}`);
-                }
+                url = `${API_BASE_URL}/api/auth/login`;
+                body = JSON.stringify({ email, password });
             } else {
-                response = await fetch(`${API_BASE_URL}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
-                });
-                responseData = await response.json(); // Parse JSON response
-
-                if (response.ok) {
-                    setMessage(`Registration successful for ${username}! Please log in.`);
-                    setIsLoginMode(true); // Switch to login mode after successful registration
-                    setEmail(''); // Clear form fields
-                    setPassword('');
-                    setUsername('');
-                } else {
-                    setMessage(`Registration failed: ${responseData.message || 'An error occurred.'}`);
-                }
+                url = `${API_BASE_URL}/api/auth/register`;
+                body = JSON.stringify({ username, email, password });
             }
-        } catch (error) {
-            console.error('Auth API call error:', error);
-            setMessage(`Network error: ${error.message}. Please ensure the backend is running.`);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: body,
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'An error occurred.');
+            }
+
+            if (isLoginMode) {
+                setMessage('Login successful!');
+                // Pass the full user data and token from the backend response
+                onLoginSuccess(data.user); // data.user contains id, username, email, isAdmin
+                // The token is also in data.token, which App.jsx will store in localStorage via onLoginSuccess
+            } else {
+                setMessage(`Registration successful for ${username}! Please log in.`);
+                setIsLoginMode(true); // Switch to login mode after successful registration
+                setEmail('');
+                setPassword('');
+                setUsername('');
+            }
+        } catch (err) {
+            console.error("Auth error:", err);
+            setMessage(`${isLoginMode ? 'Login' : 'Registration'} failed: ${err.message}.`);
+        } finally {
+            setIsLoading(false); // Clear loading state
         }
     };
 
@@ -71,7 +66,7 @@ const AuthPage = ({ onLoginSuccess, onGoBack }) => {
                     {isLoginMode ? 'Login' : 'Register'}
                 </h2>
                 {message && (
-                    <div className={`p-3 mb-4 rounded-md text-center ${message.includes('failed') || message.includes('error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                    <div className={`p-3 mb-4 rounded-md text-center ${message.includes('failed') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                         {message}
                     </div>
                 )}
@@ -123,8 +118,9 @@ const AuthPage = ({ onLoginSuccess, onGoBack }) => {
                     <button
                         type="submit"
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-300 transform hover:scale-105"
+                        disabled={isLoading} // Disable button while loading
                     >
-                        {isLoginMode ? 'Login' : 'Register'}
+                        {isLoading ? (isLoginMode ? 'Logging In...' : 'Registering...') : (isLoginMode ? 'Login' : 'Register')}
                     </button>
                 </form>
                 <div className="mt-6 text-center">
@@ -154,4 +150,5 @@ const AuthPage = ({ onLoginSuccess, onGoBack }) => {
         </div>
     );
 };
+
 export default AuthPage;

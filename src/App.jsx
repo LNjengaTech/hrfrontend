@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar.jsx';
-import HomePage from './Pages/HomePage.jsx';
-import AuthPage from './Pages/AuthPage.jsx';
-import AdminDashboard from './Pages/AdminDashboard.jsx';
-import UserAccount from './Pages/UserAccount.jsx';
-import ReviewForm from './Pages/ReviewForm.jsx';
-import HotelReviews from './Pages/HotelReviews.jsx';
+import HomePage from './pages/HomePage.jsx';
+import AuthPage from './pages/AuthPage.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
+import UserAccount from './pages/UserAccount.jsx';
+import ReviewForm from './pages/ReviewForm.jsx';
+import HotelReviews from './pages/HotelReviews.jsx';
 
 // Main App component
 const App = () => {
@@ -21,11 +21,11 @@ const App = () => {
     const [error, setError] = useState(null); // Error state for hotels fetch
     const [refreshHotelsTrigger, setRefreshHotelsTrigger] = useState(0); // State to trigger hotels fetch
 
-    // Base URL for backend API
-    const API_BASE_URL = 'http://localhost:5000';
+    // Base URL for backend API - *** IMPORTANT: REPLACE THIS WITH YOUR RENDER BACKEND URL ***
+    const API_BASE_URL = 'https://your-backend-name.onrender.com'; // Example: 'https://rating-app-backend-abc.onrender.com'
 
     // Function to fetch hotels from backend
-    const fetchHotels = async () => {
+    const fetchHotels = useCallback(async () => { // Wrapped in useCallback
         setIsLoading(true);
         try {
             const response = await fetch(`${API_BASE_URL}/api/hotels`);
@@ -41,7 +41,7 @@ const App = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [API_BASE_URL]); // Dependency for useCallback
 
     // Effect to fetch hotels and check login status on component mount or when refreshHotelsTrigger changes
     useEffect(() => {
@@ -63,7 +63,7 @@ const App = () => {
                 setIsAdmin(false);
             }
         }
-    }, [refreshHotelsTrigger]); // Depend on refreshHotelsTrigger to re-fetch hotels
+    }, [refreshHotelsTrigger, fetchHotels]); // Depend on refreshHotelsTrigger and fetchHotels
 
     // Function to handle login success from AuthPage
     const handleLoginSuccess = (userData) => {
@@ -204,7 +204,7 @@ const App = () => {
                     />
                 );
             case 'auth':
-                return <AuthPage onLoginSuccess={handleLoginSuccess} onGoBack={handleGoBack} />;
+                return <AuthPage onLoginSuccess={handleLoginSuccess} onGoBack={handleGoBack} API_BASE_URL={API_BASE_URL} />;
             case 'admin-dashboard':
                 return (
                     <AdminDashboard
